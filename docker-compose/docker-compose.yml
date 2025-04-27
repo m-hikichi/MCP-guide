@@ -1,0 +1,11 @@
+services:
+  mcp:
+    build:
+      context: ../Dockerfile
+      dockerfile: Dockerfile
+    image: mcp
+    container_name: mcp
+    volumes:
+      - ../src:/workspace/src
+    working_dir: /workspace
+    tty: true
