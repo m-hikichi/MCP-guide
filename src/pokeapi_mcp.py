@@ -3,6 +3,7 @@ from pathlib import PurePosixPath
 from urllib.parse import urljoin, urlparse
 
 import requests
+from rich import print
 from mcp.server.fastmcp import FastMCP
 
 # MCPサーバーインスタンスの作成
@@ -62,10 +63,11 @@ def get_pokemon_info(pokemon_id: int) -> dict:
 
     data = response.json()
 
+    species = get_pokemon_species_info(pokemon_id)
+    types = [TYPE_NAMES_JP.get(t["type"]["name"]) for t in data["types"]]
+
     height = data["height"] / 10  # m
     weight = data["weight"] / 10  # kg
-
-    types = [TYPE_NAMES_JP.get(t["type"]["name"]) for t in data["types"]]
 
     stats = {s["stat"]["name"]: s["base_stat"] for s in data["stats"]}
 
@@ -75,12 +77,62 @@ def get_pokemon_info(pokemon_id: int) -> dict:
     ]
 
     return {
+        "species": species,
         "types": types,
-        "weight": weight,
         "height": height,
+        "weight": weight,
         "stats": stats,
         "abilities": abilities,
     }
+
+
+@mcp.tool()
+def get_pokemon_species_info(pokemon_id: int) -> dict:
+    """
+    日本語のポケモン名と種別情報、ポケモン図鑑説明文を取得
+    """
+    path_segments = ["pokemon-species", str(pokemon_id)]
+    relative_path = posixpath.join(*path_segments)
+    ability_url = urljoin(POKEAPI_BASE, relative_path)
+
+    try:
+        response = requests.get(ability_url, timeout=10)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        # ネットワークエラーやステータスコードエラー
+        raise RuntimeError(f"特性情報の取得に失敗しました: {e}")
+
+    data = response.json()
+
+    name = None
+    for entry in data["names"]:
+        lang = entry["language"]["name"]
+        if lang in ("ja", "ja-Hrkt"):
+            name = entry["name"]
+            break
+
+    genus = None
+    for entry in data["genera"]:
+        lang = entry["language"]["name"]
+        if lang in ("ja", "ja-Hrkt"):
+            genus = entry["genus"]
+            break
+
+    flavor_text_entries = []
+    for entry in data["flavor_text_entries"]:
+        lang = entry["language"]["name"]
+        if lang == "ja":
+            flavor_text_entries.append({
+                "version": entry["version"]["name"],
+                "flavor_text": entry["flavor_text"],
+            })
+    
+    return {
+        "name": name,
+        "genus": genus,
+        "flavor_text_entries": flavor_text_entries,
+    }
+
 
 
 @mcp.tool()
@@ -123,5 +175,6 @@ def get_ability_info(ability_id: int) -> dict:
 
 if __name__ == "__main__":
     # print(get_ability_info(1))
+    # print(get_pokemon_species_info(1))
     # print(get_pokemon_info(1))
     mcp.run()
