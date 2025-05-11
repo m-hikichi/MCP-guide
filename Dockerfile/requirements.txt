@@ -1,4 +1,6 @@
 langchain==0.3.25
-langchian-ollama==0.3.2
-langchain-mcp-adapters==0.0.9
-langgraph==0.4.1
+langchain-ollama==0.3.2
+langchain-mcp-adapters==0.0.11
+langgraph==0.4.3
+mcp==1.8.0
+mcp[cli]
