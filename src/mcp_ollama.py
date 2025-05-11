@@ -25,7 +25,7 @@ async def run_agent_query():
     # LLM (ollama) の初期化
     llm = ChatOllama(
         base_url="http://ollama:11434",
-        model="Llama-3-ELYZA:8B-q4_K_M",
+        model="EZO-Qwen2.5:32b-instruct-q4_K_M",
         temperature=0,
     )
 
@@ -42,7 +42,7 @@ async def run_agent_query():
         agent = create_react_agent(llm, client.get_tools(), prompt=system_prompt)
 
         # エージェントにクエリを送信し、結果を出力
-        result = await agent.ainvoke({"messages": "123 * 111は?"})
+        result = await agent.ainvoke({"messages": "(123 + 531) * 987は?"})
 
         for message in result["messages"]:
             print(f"\n--- {type(message).__name__} ---")
