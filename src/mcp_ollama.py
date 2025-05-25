@@ -33,20 +33,22 @@ async def run_agent_query():
     config = load_mcp_config("mcp_config.json")
 
     # MCPクライアントとReActエージェントのセットアップ
-    async with MultiServerMCPClient(config) as client:
-        system_prompt = SystemMessage(
-            "あなたはMCPサーバーを使用するAIアシスタントです。"
-            "Toolの結果を優先して回答として採用してください"
-            "回答は日本語でお願いします。"
-        )
-        agent = create_react_agent(llm, client.get_tools(), prompt=system_prompt)
+    client = MultiServerMCPClient(config)
+    tools = await client.get_tools()
 
-        # エージェントにクエリを送信し、結果を出力
-        result = await agent.ainvoke({"messages": "(123 + 531) * 987は?"})
+    system_prompt = SystemMessage(
+        "あなたはMCPサーバーを使用するAIアシスタントです。"
+        "Toolの結果を優先して回答として採用してください"
+        "回答は日本語でお願いします。"
+    )
+    agent = create_react_agent(llm, tools, prompt=system_prompt)
 
-        for message in result["messages"]:
-            print(f"\n--- {type(message).__name__} ---")
-            print(message)
+    # エージェントにクエリを送信し、結果を出力
+    result = await agent.ainvoke({"messages": "(123 + 531) * 987は?"})
+
+    for message in result["messages"]:
+        print(f"\n--- {type(message).__name__} ---")
+        print(message)
 
 
 if __name__ == "__main__":
