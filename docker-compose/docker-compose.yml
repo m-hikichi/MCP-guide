@@ -9,3 +9,14 @@ services:
       - ../src:/workspace/src
     working_dir: /workspace
     tty: true
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "6274:6274"
+      - "6277:6277"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - mcp
