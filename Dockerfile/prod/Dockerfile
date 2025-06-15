@@ -5,7 +5,7 @@ RUN apt update
 RUN apt install -y nodejs npm
 
 WORKDIR /tmp
-COPY Dockerfile/requirements.txt .
+COPY Dockerfile/prod/requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY src /workspace/src
