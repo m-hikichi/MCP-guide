@@ -5,5 +5,10 @@ RUN apt update
 RUN apt install -y nodejs npm
 
 WORKDIR /tmp
-COPY requirements.txt .
+COPY Dockerfile/prod/requirements.txt .
 RUN pip install -r requirements.txt
+
+COPY src /workspace/src
+
+WORKDIR /workspace/src
+CMD ["uv", "run", "mcp_server.py"]
