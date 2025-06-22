@@ -17,7 +17,7 @@ async def main():
             await session.initialize()
 
             # "hello_world" ツールの呼び出し
-            result = await session.call_tool("hello_world", {"name": "MCP"})
+            result = await session.call_tool("add", {"a": 2, "b": 3})
             print("Tool result: ", result.content)
 
 
