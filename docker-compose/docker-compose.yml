@@ -1,7 +1,7 @@
 services:
   mcp:
     build:
-      context: ../Dockerfile
+      context: ../Dockerfile/dev
       dockerfile: Dockerfile
     image: mcp
     container_name: mcp
@@ -9,6 +9,7 @@ services:
       - ../src:/workspace/src
     working_dir: /workspace
     tty: true
+    entrypoint: sh -c "cd src && mcp dev mcp_server.py"
 
   nginx:
     image: nginx:latest
